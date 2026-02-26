@@ -1,0 +1,60 @@
+# =============================================================================
+# ai-gateway configuration
+# =============================================================================
+# Environment variables are expanded: ${VAR} or $VAR
+
+providers:
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+
+  ollama:
+    base_url: "http://localhost:11434"
+
+# Named profiles — apps reference a profile instead of hardcoding provider/model.
+# Any field omitted falls back to the "default" profile.
+profiles:
+  default:
+    provider: ollama
+    model: llama3.1
+    temperature: 0.3
+    max_tokens: 4096
+
+  fast:
+    provider: anthropic
+    model: claude-haiku-4-5-20251001
+    temperature: 0.3
+    max_tokens: 2048
+
+  accurate:
+    provider: anthropic
+    model: claude-sonnet-4-6
+    temperature: 0.1
+    max_tokens: 8192
+
+  local:
+    provider: ollama
+    model: llama3.1
+    temperature: 0.3
+    max_tokens: 4096
+
+  cheap:
+    provider: openai
+    model: gpt-4o-mini
+    temperature: 0.5
+    max_tokens: 2048
+
+# If the primary provider fails, try these in order.
+fallback_chain:
+  - anthropic
+  - openai
+  - ollama
+
+server:
+  port: 8080
+  # Optional: require X-API-Key header on all requests.
+  # Leave empty to run without auth (trusted-internal mode).
+  api_key: "${GATEWAY_API_KEY}"
+  log_requests: true
