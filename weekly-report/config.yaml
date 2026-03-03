@@ -1,0 +1,56 @@
+# =============================================================================
+# dbt Weekly Report - Configuration
+# =============================================================================
+
+# GitHub settings
+github:
+  # Personal access token (or set GITHUB_TOKEN env var)
+  token: ""
+  # Repositories to track
+  repositories:
+    - owner: "dbt-labs"
+      name: "dbt-core"
+    - owner: "dbt-labs"
+      name: "dbt-adapters"
+
+# Time range configuration
+# Use "preset" for quick selection, or "custom" for explicit date range
+time_range:
+  # Preset: "weekly" (7 days), "biweekly" (14 days), "monthly" (30 days),
+  #         "quarterly" (90 days), or "custom"
+  preset: "custom"
+  # Custom range (only used when preset is "custom")
+  # Format: YYYY-MM-DD
+  custom_start: "2026-01-01"
+  custom_end: "2026-02-26"
+
+# LLM — requests can go to either:
+#   • ai-gateway-platform (url: http://localhost:8090) — cloud models (claude-*, gpt-4o) and proxied Ollama
+#   • Ollama directly        (url: http://localhost:11434) — local models without Docker NAT timeout issues
+#
+# NOTE: llama3.1 via the gateway has a Docker NAT timeout problem (~25s inference > NAT idle cutoff).
+#       Use local Ollama directly for llama3.1, or use a cloud model via the gateway.
+llm:
+  gateway:
+    url: "http://localhost:11434"   # direct Ollama — no Docker NAT timeout; switch to :8090 for cloud models
+    api_key: ""                     # not required for local Ollama; use "pk-platform-dev-001" for gateway
+    model: "llama3.1"               # local: llama3.1 | via gateway (:8090): claude-sonnet-4-20250514, gpt-4o
+
+# Team callout sections
+# Track specific team members' contributions in a dedicated section
+teams:
+  - name: "India Team"
+    description: "New team spun up in January — tracking ramp-up and contributions"
+    members:
+      - "aahel"
+      - "tauhid621"
+      - "ash2shukla"
+      - "sriramr98"
+
+# Report output settings
+report:
+  output_dir: "./reports"
+  # Format: "html" or "markdown"
+  format: "markdown"
+  # Include charts in the report
+  include_charts: true
