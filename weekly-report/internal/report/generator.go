@@ -20,25 +20,27 @@ type Generator struct {
 	llmProvider llm.Provider
 	config      config.ReportConfig
 	teams       []config.TeamConfig
+	prompts     *PromptsConfig
 }
 
 // NewGenerator creates a new report generator.
-func NewGenerator(provider llm.Provider, cfg config.ReportConfig, teams []config.TeamConfig) *Generator {
+func NewGenerator(provider llm.Provider, cfg config.ReportConfig, teams []config.TeamConfig, prompts *PromptsConfig) *Generator {
 	return &Generator{
 		llmProvider: provider,
 		config:      cfg,
 		teams:       teams,
+		prompts:     prompts,
 	}
 }
 
 // generate resolves a named template and calls the LLM.
 func (g *Generator) generate(ctx context.Context, tmpl, data string) (string, error) {
-	prompt, err := buildPrompt(tmpl, data)
+	prompt, err := buildPrompt(g.prompts, tmpl, data)
 	if err != nil {
 		return "", err
 	}
 	log.Printf("Generating %s via %s...", tmpl, g.llmProvider.Name())
-	return g.llmProvider.GenerateText(ctx, systemPrompt, prompt)
+	return g.llmProvider.GenerateText(ctx, g.prompts.System, prompt)
 }
 
 // Generate creates the full report.

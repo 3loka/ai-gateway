@@ -16,11 +16,12 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "config.yaml", "Path to configuration file")
-	preset := flag.String("range", "", "Override time range preset (weekly, biweekly, monthly, quarterly)")
-	model := flag.String("model", "", "Override LLM model (e.g. llama3.1, claude-sonnet-4-20250514, gpt-4o)")
-	gatewayURL := flag.String("url", "", "Override gateway URL (e.g. http://localhost:8090 for ai-gateway-platform)")
-	dryRun := flag.Bool("dry-run", false, "Fetch GitHub data only, skip LLM generation")
+	configPath  := flag.String("config", "config.yaml", "Path to configuration file")
+	promptsPath := flag.String("prompts", "prompts.yaml", "Path to YAML prompts file (system + templates)")
+	preset      := flag.String("range", "", "Override time range preset (weekly, biweekly, monthly, quarterly)")
+	model       := flag.String("model", "", "Override LLM model (e.g. llama3.1, claude-sonnet-4-20250514, gpt-4o)")
+	gatewayURL  := flag.String("url", "", "Override gateway URL (e.g. http://localhost:8090 for ai-gateway-platform)")
+	dryRun      := flag.Bool("dry-run", false, "Fetch GitHub data only, skip LLM generation")
 	flag.Parse()
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -127,8 +128,11 @@ func main() {
 	}
 	log.Printf("LLM ready: %s", llmProvider.Name())
 
+	prompts := report.LoadPrompts(*promptsPath)
+	log.Printf("Prompts loaded from: %s", *promptsPath)
+
 	// ---- Step 3: Generate report ----
-	gen := report.NewGenerator(llmProvider, cfg.Report, cfg.Teams)
+	gen := report.NewGenerator(llmProvider, cfg.Report, cfg.Teams, prompts)
 	outputPath, err := gen.Generate(ctx, stats, trendStats, rangeLabel)
 	if err != nil {
 		log.Fatalf("Failed to generate report: %v", err)
